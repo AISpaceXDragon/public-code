@@ -96,7 +96,7 @@ See helpers/anue_labels.py
 python preperation/createLabels.py --datadir $ANUE --id-type $IDTYPE --color [True|False] --instance [True|False] --num-workers $C
 ```
 
-- ANUE is the path to the AutoNUE dataset
+- ANUE is the path to the AutoNUE dataset(the path to the gtFine for any dataset you have downloaded from the IDD website,for example: "/Users/srimanthdhondy/Programs/autodataset/idd20kII",here the idd20kII has two folders gtFine and leftImg8bit)
 - IDTYPE can be id, csId, csTrainId, level3Id, level2Id, level1Id. 
 - color True  generates the color masks
 - instance True generates the instance masks with the id given by IDTYPE
@@ -108,6 +108,7 @@ For the supervised domain adaptation and semantic segmentation tasks, the masks 
 ```bash
 python preperation/createLabels.py --datadir $ANUE --id-type level3Id --num-workers $C
 ```
+**NOTE**:In the scripts json2instanceImg.py, json2labelImg.py be sure to change the highlighted path in the line "sys.path.append("**/Users/srimanthdhondy/Programs**/public-code/helpers/")" as per your download location.
 
 Following commands are updated for the target labels of other domain adaptation tasks:
 
