@@ -2,22 +2,24 @@
 #
 
 # python imports
+import sys
+sys.path.append("/Users/srimanthdhondy/Programs/public-code/helpers/")
 from anue_labels import name2label
 from annotation import Annotation
 import os
-import sys
 import getopt
-
+import tqdm
+import sys
 import numpy
 
 # Image processing
 # Check if PIL is actually Pillow as expected
-try:
-    from PIL import PILLOW_VERSION
-except:
-    print("Please install the module 'Pillow' for image processing, e.g.")
-    print("pip install pillow")
-    sys.exit(-1)
+#try:
+    #from PIL import PILLOW_VERSION
+#except:
+    #print("Please install the module 'Pillow' for image processing, e.g.")
+    #print("pip install pillow")
+    #sys.exit(-1)
 
 try:
     import PIL.Image as Image

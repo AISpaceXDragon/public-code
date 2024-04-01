@@ -3,6 +3,7 @@
 
 # python imports
 from __future__ import print_function
+from functools import partial
 import os
 import glob
 import sys
@@ -10,6 +11,7 @@ import sys
 from imageio import imread, imsave
 import numpy as np
 from numpngw import write_png
+import PIL
 
 from json2labelImg import json2labelImg
 from json2instanceImg import json2instanceImg
@@ -23,11 +25,28 @@ import os
 import pandas as pd
 import shutil
 
+global args
 args = None
 
+def get_args():
+    parser = ArgumentParser()
 
-def process_folder(fn):
-    global args
+    parser.add_argument('--datadir', default="")
+    parser.add_argument('--id-type', default='level3Id')
+    parser.add_argument('--color', type=bool, default=False)
+    parser.add_argument('--instance', type=bool, default=False)
+    parser.add_argument('--panoptic', type=bool, default=False)
+    parser.add_argument('--semisup_da', type=bool, default=False)
+    parser.add_argument('--unsup_da', type=bool, default=False)
+    parser.add_argument('--weaksup_da', type=bool, default=False)
+    parser.add_argument('--num-workers', type=int, default=10)
+
+    args = parser.parse_args()
+
+    return args
+
+def process_folder(fn,args):
+    
 
     dst = fn.replace("_polygons.json", "_label{}s.png".format(args.id_type))
 
@@ -57,29 +76,13 @@ def process_folder(fn):
         try:
             json2labelImg(fn, dst, 'color')
         except:
-            tqdm.write("Failed to convert: {}".format(f))
+            tqdm.write("Failed to convert: {}".format(fn))
             raise
 
     # if args.panoptic and args.instance:
         # panoptic_converter(f, out_folder, out_file)
 
 
-def get_args():
-    parser = ArgumentParser()
-
-    parser.add_argument('--datadir', default="")
-    parser.add_argument('--id-type', default='level3Id')
-    parser.add_argument('--color', type=bool, default=False)
-    parser.add_argument('--instance', type=bool, default=False)
-    parser.add_argument('--panoptic', type=bool, default=False)
-    parser.add_argument('--semisup_da', type=bool, default=False)
-    parser.add_argument('--unsup_da', type=bool, default=False)
-    parser.add_argument('--weaksup_da', type=bool, default=False)
-    parser.add_argument('--num-workers', type=int, default=10)
-
-    args = parser.parse_args()
-
-    return args
 
 # The main method
 
@@ -124,7 +127,7 @@ def main(args):
 
     #print('args.semisup_da', args.semisup_da, len(files))
     if not files:
-        tqdm.writeError(
+        tqdm.write(
             "Did not find any files. Please consult the README.")
 
     # a bit verbose
@@ -141,8 +144,7 @@ def main(args):
 
     pool = Pool(args.num_workers)
     # results = pool.map(process_pred_gt_pair, pairs)
-    results = list(
-        tqdm(pool.imap(process_folder, files), total=len(files)))
+    results = list(tqdm(pool.imap(partial(process_folder, args=args), files), total=len(files)))
     pool.close()
     pool.join()
 
